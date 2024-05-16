@@ -9,8 +9,9 @@
 Adafruit_SSD1306 display(OLED_RESET); // Skapar ett objekt av typen Adafruit_SSD1306 för OLED-skärmen
 
 char im[256], data[256]; // Skapar arrayer för indata och imaginärdelar av FFT-transformen
-char x = 0, ylim = 32; // Definierar variabler för visningsparametrar
+char x = 0; // Definierar variabeln för vågornas horisontella position
 int i = 0, val; // Skapar variabler för loopindex och värden
+int maxWaveHeight = 16; // Definierar maxhöjden för vågorna
 
 // Definierar känslighetsfaktorernas intervall
 float minSensitivityFactor = 0.1;
@@ -79,7 +80,8 @@ void loop() {
   display.clearDisplay(); // Rensar skärmen inför ny uppdatering
   for (i = 1; i < 128; i++) { // Loopar igenom FFT-resultatet för att rita diagram på skärmen
     int dat = sqrt(data[i] * data[i] + im[i] * im[i]); // Beräknar amplituden för varje frekvens
-    display.drawLine(i * 2 + x, ylim, i * 2 + x, ylim - dat, WHITE); // Ritar en linje för varje frekvens
+    int waveHeight = min(dat, maxWaveHeight); // Begränsa vågornas höjd till maxWaveHeight
+    display.drawLine(i * 2 + x, display.height(), i * 2 + x, display.height() - waveHeight, WHITE); // Ritar en linje för varje frekvens
     if (dat > maxDB) { // Uppdaterar max-amplituden och frekvensindexet vid behov
       maxDB = dat;
       maxFrequencyIndex = i;
@@ -105,3 +107,4 @@ void loop() {
   display.display(); 
 
   delay(250); // Lägger till en liten fördröjning för bättre display så att inte för många toner poppar upp
+}
